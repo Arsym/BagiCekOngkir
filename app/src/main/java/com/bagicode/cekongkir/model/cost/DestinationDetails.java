@@ -9,32 +9,28 @@ import com.google.gson.annotations.SerializedName;
 
 public class DestinationDetails {
 
-    @SerializedName("city_id")
+    @SerializedName("subdistrict_id")
     @Expose
-    private String cityId;
+    private String subdistrictId;
     @SerializedName("province_id")
     @Expose
     private String provinceId;
     @SerializedName("province")
     @Expose
     private String province;
+    @SerializedName("city_id")
+    @Expose
+    private String cityId;
+    @SerializedName("city")
+    @Expose
+    private String city;
     @SerializedName("type")
     @Expose
     private String type;
-    @SerializedName("city_name")
+    @SerializedName("subdistrict_name")
     @Expose
-    private String cityName;
-    @SerializedName("postal_code")
-    @Expose
-    private String postalCode;
+    private String subdistrictName;
 
-    public String getCityId() {
-        return cityId;
-    }
-
-    public void setCityId(String cityId) {
-        this.cityId = cityId;
-    }
 
     public String getProvinceId() {
         return provinceId;
@@ -52,6 +48,30 @@ public class DestinationDetails {
         this.province = province;
     }
 
+    public String getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(String cityId) {
+        this.cityId = cityId;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getSubdistrictId() {
+        return subdistrictId;
+    }
+
+    public void setSubdistrictId(String subdistrictId) {
+        this.subdistrictId = subdistrictId;
+    }
+
     public String getType() {
         return type;
     }
@@ -60,20 +80,13 @@ public class DestinationDetails {
         this.type = type;
     }
 
-    public String getCityName() {
-        return cityName;
+    public String getSubdistrictName() {
+        return subdistrictName;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public void setSubdistrictName(String subdistrictName) {
+        this.subdistrictName = subdistrictName;
     }
 
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
 
 }

@@ -1,11 +1,9 @@
-package com.bagicode.cekongkir.model.province;
-
+package com.bagicode.cekongkir.model.subdistrict;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Status {
-
     @SerializedName("code")
     @Expose
     private Integer code;
@@ -28,5 +26,4 @@ public class Status {
     public void setDescription(String description) {
         this.description = description;
     }
-
 }

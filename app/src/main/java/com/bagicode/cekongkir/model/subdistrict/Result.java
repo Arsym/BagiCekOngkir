@@ -1,14 +1,9 @@
-package com.bagicode.cekongkir.model.cost;
-
-/**
- * Created by Robby Dianputra on 2/14/2018.
- */
+package com.bagicode.cekongkir.model.subdistrict;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class OriginDetails {
-
+public class Result {
     @SerializedName("subdistrict_id")
     @Expose
     private String subdistrictId;
@@ -31,6 +26,16 @@ public class OriginDetails {
     @Expose
     private String subdistrictName;
 
+
+    public Result(String cityId, String provinceId, String province, String type, String cityName, String subdistrictId, String subdistrictName) {
+        this.cityId = cityId;
+        this.provinceId = provinceId;
+        this.province = province;
+        this.type = type;
+        this.city = cityName;
+        this.subdistrictId = subdistrictId;
+        this.subdistrictName = subdistrictName;
+    }
 
     public String getProvinceId() {
         return provinceId;

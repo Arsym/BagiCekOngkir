@@ -1,15 +1,10 @@
 package com.bagicode.cekongkir;
 
-/*
-* Create by robby dianputra
-* web : bagicode.com
-* youtube : youtube.com/robbydianputra
-* */
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -27,6 +22,7 @@ import android.widget.Toast;
 import com.bagicode.cekongkir.adapter.CityAdapter;
 import com.bagicode.cekongkir.adapter.ExpedisiAdapter;
 import com.bagicode.cekongkir.adapter.ProvinceAdapter;
+import com.bagicode.cekongkir.adapter.SubdistrictAdapter;
 import com.bagicode.cekongkir.api.ApiService;
 import com.bagicode.cekongkir.api.ApiUrl;
 import com.bagicode.cekongkir.model.city.ItemCity;
@@ -34,6 +30,7 @@ import com.bagicode.cekongkir.model.cost.ItemCost;
 import com.bagicode.cekongkir.model.expedisi.ItemExpedisi;
 import com.bagicode.cekongkir.model.province.ItemProvince;
 import com.bagicode.cekongkir.model.province.Result;
+import com.bagicode.cekongkir.model.subdistrict.ItemSubdistrict;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -49,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText etFromProvince, etToProvince;
     private EditText etFromCity, etToCity;
+    private EditText etFromSubdistrict, etToSubdistrict;
     private EditText etWeight, etCourier;
 
     private AlertDialog.Builder alert;
@@ -62,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     private CityAdapter adapter_city;
     private List<com.bagicode.cekongkir.model.city.Result> ListCity = new ArrayList<com.bagicode.cekongkir.model.city.Result>();
 
+    private SubdistrictAdapter adapter_subdistrict;
+    private List<com.bagicode.cekongkir.model.subdistrict.Result> ListSubdistrict = new ArrayList<com.bagicode.cekongkir.model.subdistrict.Result>();
+
     private ExpedisiAdapter adapter_expedisi;
     private List<ItemExpedisi> listItemExpedisi = new ArrayList<ItemExpedisi>();
 
@@ -74,15 +75,34 @@ public class MainActivity extends AppCompatActivity {
 
         etFromProvince = (EditText) findViewById(R.id.etFromProvince);
         etFromCity = (EditText) findViewById(R.id.etFromCity);
+        etFromSubdistrict = (EditText) findViewById(R.id.etFromSubdistrict);
         etToProvince = (EditText) findViewById(R.id.etToProvince);
         etToCity = (EditText) findViewById(R.id.etToCity);
+        etToSubdistrict = (EditText) findViewById(R.id.etToSubdistrict);
         etWeight = (EditText) findViewById(R.id.etWeight);
         etCourier = (EditText) findViewById(R.id.etCourier);
 
         etFromProvince.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popUpProvince(etFromProvince, etFromCity);
+                popUpProvince(etFromProvince, etFromCity, etFromSubdistrict);
+            }
+        });
+
+        etFromSubdistrict.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                try {
+                    if (etFromCity.getTag().equals("")) {
+                        etFromCity.setError("Please choose your form city");
+                    } else {
+                        popUpSubdistrict(etFromSubdistrict, etFromCity);
+                    }
+
+                } catch (NullPointerException e) {
+                    etFromCity.setError("Please choose your form city");
+                }
 
             }
         });
@@ -93,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     if (etFromProvince.getTag().equals("")) {
-                        etFromProvince.setError("Please chooise your form province");
+                        etFromProvince.setError("Please choose your form province");
                     } else {
-                        popUpCity(etFromCity, etFromProvince);
+                        popUpCity(etFromCity, etFromSubdistrict, etFromProvince);
                     }
 
                 } catch (NullPointerException e) {
-                    etFromProvince.setError("Please chooise your form province");
+                    etFromProvince.setError("Please choose your form province");
                 }
 
             }
@@ -108,7 +128,24 @@ public class MainActivity extends AppCompatActivity {
         etToProvince.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popUpProvince(etToProvince, etToCity);
+                popUpProvince(etToProvince, etToCity, etToSubdistrict);
+            }
+        });
+
+        etToSubdistrict.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                try {
+                    if (etFromCity.getTag().equals("")) {
+                        etFromCity.setError("Please choose your form city");
+                    } else {
+                        popUpSubdistrict(etToSubdistrict, etToCity);
+                    }
+
+                } catch (NullPointerException e) {
+                    etToCity.setError("Please choose your form city");
+                }
 
             }
         });
@@ -119,13 +156,13 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     if (etToProvince.getTag().equals("")) {
-                        etToProvince.setError("Please chooise your to province");
+                        etToProvince.setError("Please choose your to province");
                     } else {
-                        popUpCity(etToCity, etToProvince);
+                        popUpCity(etToCity, etToSubdistrict, etToProvince);
                     }
 
                 } catch (NullPointerException e) {
-                    etToProvince.setError("Please chooise your to province");
+                    etToProvince.setError("Please choose your to province");
                 }
 
             }
@@ -144,7 +181,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 String Origin = etFromCity.getText().toString();
+                String originType = "subdistrict";
                 String destination = etToCity.getText().toString();
+                String destinationType = "subdistrict";
                 String Weight = etWeight.getText().toString();
                 String expedisi = etCourier.getText().toString();
 
@@ -164,7 +203,9 @@ public class MainActivity extends AppCompatActivity {
 
                     getCoast(
                             etFromCity.getTag().toString(),
+                            originType,
                             etToCity.getTag().toString(),
+                            destinationType,
                             etWeight.getText().toString(),
                             etCourier.getText().toString()
                     );
@@ -174,7 +215,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void popUpProvince(final EditText etProvince, final EditText etCity ) {
+
+
+    public void popUpProvince(final EditText etProvince, final EditText etCity, final EditText etSubdistrict ) {
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -211,6 +254,9 @@ public class MainActivity extends AppCompatActivity {
                 etCity.setText("");
                 etCity.setTag("");
 
+                etSubdistrict.setText("");
+                etSubdistrict.setTag("");
+
                 ad.dismiss();
             }
         });
@@ -223,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void popUpCity(final EditText etCity, final EditText etProvince) {
+    public void popUpCity(final EditText etCity, final EditText etSubdistrict, final EditText etProvince) {
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -257,6 +303,9 @@ public class MainActivity extends AppCompatActivity {
                 etCity.setText(cn.getCityName());
                 etCity.setTag(cn.getCityId());
 
+                etSubdistrict.setText("");
+                etSubdistrict.setTag("");
+
                 ad.dismiss();
             }
         });
@@ -267,6 +316,50 @@ public class MainActivity extends AppCompatActivity {
 
         getCity(etProvince.getTag().toString());
 
+    }
+
+    private void popUpSubdistrict(final EditText etSubdistrict, final EditText etCity) {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View alertLayout = inflater.inflate(R.layout.custom_dialog_search, null);
+
+        alert = new AlertDialog.Builder(MainActivity.this);
+        alert.setTitle("List Subdistrict");
+        alert.setMessage("select your Subdistrict");
+        alert.setView(alertLayout);
+        alert.setCancelable(true);
+
+        ad = alert.show();
+
+        searchList = (EditText) alertLayout.findViewById(R.id.searchItem);
+        searchList.addTextChangedListener(new MyTextWatcherSubdistrict(searchList));
+        searchList.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
+
+        mListView = (ListView) alertLayout.findViewById(R.id.listItem);
+
+        ListSubdistrict.clear();
+        adapter_subdistrict = new SubdistrictAdapter(MainActivity.this, ListSubdistrict);
+        mListView.setClickable(true);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Object o = mListView.getItemAtPosition(i);
+                com.bagicode.cekongkir.model.subdistrict.Result cn = (com.bagicode.cekongkir.model.subdistrict.Result) o;
+
+                etSubdistrict.setError(null);
+                etSubdistrict.setText(cn.getSubdistrictName());
+                etSubdistrict.setTag(cn.getSubdistrictId());
+
+                ad.dismiss();
+            }
+        });
+
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Please wait..");
+        progressDialog.show();
+
+        getSubdistrict(etCity.getTag().toString());
     }
 
     public void popUpExpedisi(final EditText etExpedisi) {
@@ -284,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
         ad = alert.show();
 
         searchList = (EditText) alertLayout.findViewById(R.id.searchItem);
-        searchList.addTextChangedListener(new MyTextWatcherCity(searchList));
+        searchList.addTextChangedListener(new MyTextWatcherSubdistrict(searchList));
         searchList.setFilters(new InputFilter[]{new InputFilter.AllCaps()});
 
         mListView = (ListView) alertLayout.findViewById(R.id.listItem);
@@ -352,6 +445,29 @@ public class MainActivity extends AppCompatActivity {
             switch (view.getId()) {
                 case R.id.searchItem:
                     adapter_city.filter(editable.toString());
+                    break;
+            }
+        }
+    }
+
+    private class MyTextWatcherSubdistrict implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcherSubdistrict(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence s, int i, int before, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.searchItem:
+                    adapter_subdistrict.filter(editable.toString());
                     break;
             }
         }
@@ -459,6 +575,58 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void getSubdistrict(String id_city) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(ApiUrl.URL_ROOT_HTTPS)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService service = retrofit.create(ApiService.class);
+        Call<ItemSubdistrict> call = service.getSubdistrict(id_city);
+
+        call.enqueue(new Callback<ItemSubdistrict>() {
+            @Override
+            public void onResponse(Call<ItemSubdistrict> call, Response<ItemSubdistrict> response) {
+
+                progressDialog.dismiss();
+                Log.v("wow", "json : " + new Gson().toJson(response));
+
+                if (response.isSuccessful()) {
+
+                    int count_data = response.body().getRajaongkir().getResults().size();
+                    for (int a = 0; a <= count_data - 1; a++) {
+                        com.bagicode.cekongkir.model.subdistrict.Result itemCity = new com.bagicode.cekongkir.model.subdistrict.Result(
+                                response.body().getRajaongkir().getResults().get(a).getCityId(),
+                                response.body().getRajaongkir().getResults().get(a).getProvinceId(),
+                                response.body().getRajaongkir().getResults().get(a).getProvince(),
+                                response.body().getRajaongkir().getResults().get(a).getType(),
+                                response.body().getRajaongkir().getResults().get(a).getCity(),
+                                response.body().getRajaongkir().getResults().get(a).getSubdistrictId(),
+                                response.body().getRajaongkir().getResults().get(a).getSubdistrictName()
+                        );
+
+                        ListSubdistrict.add(itemCity);
+                        mListView.setAdapter(adapter_subdistrict);
+                    }
+
+                    adapter_subdistrict.setList(ListSubdistrict);
+                    adapter_subdistrict.filter("");
+
+                } else {
+                    String error = "Error Retrive Data from Server !!!";
+                    Toast.makeText(MainActivity.this, error, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ItemSubdistrict> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(MainActivity.this, "Message : Error " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void getExpedisi() {
 
         ItemExpedisi itemItemExpedisi = new ItemExpedisi();
@@ -478,7 +646,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getCoast(String origin,
+                         String originType,
                          String destination,
+                         String destinationType,
                          String weight,
                          String courier) {
 
@@ -489,9 +659,11 @@ public class MainActivity extends AppCompatActivity {
 
         ApiService service = retrofit.create(ApiService.class);
         Call<ItemCost> call = service.getCost(
-                "request-api-from-rajaongkir",
+                "3f3bce6f9e0d62d356f48cb8040b5653",
                 origin,
+                originType,
                 destination,
+                destinationType,
                 weight,
                 courier
         );
@@ -512,7 +684,7 @@ public class MainActivity extends AppCompatActivity {
                         View alertLayout = inflater.inflate(R.layout.custom_dialog_result, null);
                         alert = new AlertDialog.Builder(MainActivity.this);
                         alert.setTitle("Result Cost");
-                        alert.setMessage("this result your search");
+                        alert.setMessage(response.body().getRajaongkir().getResults().get(0).getName());
                         alert.setView(alertLayout);
                         alert.setCancelable(true);
 
@@ -524,24 +696,19 @@ public class MainActivity extends AppCompatActivity {
                         TextView tv_coast = (TextView) alertLayout.findViewById(R.id.tv_coast);
                         TextView tv_time = (TextView) alertLayout.findViewById(R.id.tv_time);
 
-                        tv_origin.setText(response.body().getRajaongkir().getOriginDetails().getCityName()+" (Postal Code : "+
-                                response.body().getRajaongkir().getOriginDetails().getPostalCode()+")");
+                        tv_origin.setText(response.body().getRajaongkir().getOriginDetails().getSubdistrictName()+", "+
+                                response.body().getRajaongkir().getOriginDetails().getCity()+", "+response.body().getRajaongkir().getOriginDetails().getProvince());
 
-                        tv_destination.setText(response.body().getRajaongkir().getDestinationDetails().getCityName()+" (Postal Code : "+
-                                response.body().getRajaongkir().getDestinationDetails().getPostalCode()+")");
+                        tv_destination.setText(response.body().getRajaongkir().getDestinationDetails().getSubdistrictName()+", "+
+                                response.body().getRajaongkir().getDestinationDetails().getCity()+", "+response.body().getRajaongkir().getDestinationDetails().getProvince());
 
                         tv_expedisi.setText(response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getDescription()+" ("+
-                                response.body().getRajaongkir().getResults().get(0).getName()+") ");
+                                response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getService()+") ");
 
                         tv_coast.setText("Rp. "+response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getCost().get(0).getValue().toString());
 
                         tv_time.setText(response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getCost().get(0).getEtd()+" (Days)");
 
-                        etFromProvince.setText("");
-                        etFromCity.setText("");
-                        etToProvince.setText("");
-                        etToCity.setText("");
-                        etWeight.setText("");
                         etCourier.setText("");
                     } else {
 

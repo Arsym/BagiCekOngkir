@@ -1,8 +1,5 @@
 package com.bagicode.cekongkir.model.city;
 
-/**
- * Created by Robby Dianputra on 2/13/2018.
- */
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

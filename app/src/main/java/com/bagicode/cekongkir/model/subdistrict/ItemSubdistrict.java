@@ -1,19 +1,12 @@
-package com.bagicode.cekongkir.model.city;
-
-/**
- * Created by Robby Dianputra on 2/13/2018.
- */
+package com.bagicode.cekongkir.model.subdistrict;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class ItemCity {
-
+public class ItemSubdistrict {
     @SerializedName("rajaongkir")
     @Expose
     private Rajaongkir rajaongkir;
-
-    public ItemCity(Rajaongkir rajaongkir) { this.rajaongkir = rajaongkir;}
 
     public Rajaongkir getRajaongkir() {
         return rajaongkir;
