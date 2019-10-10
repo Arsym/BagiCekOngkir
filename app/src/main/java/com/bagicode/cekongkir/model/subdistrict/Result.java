@@ -25,6 +25,9 @@ public class Result {
     @SerializedName("subdistrict_name")
     @Expose
     private String subdistrictName;
+    @SerializedName("postal_code")
+    @Expose
+    private String postalCode;
 
 
     public Result(String cityId, String provinceId, String province, String type, String cityName, String subdistrictId, String subdistrictName) {
@@ -91,6 +94,13 @@ public class Result {
 
     public void setSubdistrictName(String subdistrictName) {
         this.subdistrictName = subdistrictName;
+    }
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
     }
 
 }

@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                     if (etFromCity.getTag().equals("")) {
                         etFromCity.setError("Please choose your form city");
                     } else {
-                        popUpSubdistrict(etFromSubdistrict, etFromCity);
+                        popUpSubdistrict(etFromSubdistrict, etFromCity, etFromProvince);
                     }
 
                 } catch (NullPointerException e) {
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                     if (etFromProvince.getTag().equals("")) {
                         etFromProvince.setError("Please choose your form province");
                     } else {
-                        popUpCity(etFromCity, etFromSubdistrict, etFromProvince);
+                        popUpCity(etFromCity, etFromProvince, etFromSubdistrict);
                     }
 
                 } catch (NullPointerException e) {
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                     if (etFromCity.getTag().equals("")) {
                         etFromCity.setError("Please choose your form city");
                     } else {
-                        popUpSubdistrict(etToSubdistrict, etToCity);
+                        popUpSubdistrict(etToSubdistrict, etToCity, etToProvince);
                     }
 
                 } catch (NullPointerException e) {
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                     if (etToProvince.getTag().equals("")) {
                         etToProvince.setError("Please choose your to province");
                     } else {
-                        popUpCity(etToCity, etToSubdistrict, etToProvince);
+                        popUpCity(etToCity, etToProvince, etFromSubdistrict);
                     }
 
                 } catch (NullPointerException e) {
@@ -180,17 +180,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String Origin = etFromCity.getText().toString();
+                String Origin = etFromSubdistrict.getText().toString();
                 String originType = "subdistrict";
-                String destination = etToCity.getText().toString();
+                String destination = etToSubdistrict.getText().toString();
                 String destinationType = "subdistrict";
                 String Weight = etWeight.getText().toString();
                 String expedisi = etCourier.getText().toString();
 
                 if (Origin.equals("")){
-                    etFromCity.setError("Please input your origin");
+                    etFromSubdistrict.setError("Please input your origin");
                 } else if (destination.equals("")){
-                    etToCity.setError("Please input your destination");
+                    etToSubdistrict.setError("Please input your destination");
                 } else if (Weight.equals("")){
                     etWeight.setError("Please input your Weight");
                 } else if (expedisi.equals("")){
@@ -202,9 +202,9 @@ public class MainActivity extends AppCompatActivity {
                     progressDialog.show();
 
                     getCoast(
-                            etFromCity.getTag().toString(),
+                            etFromSubdistrict.getTag().toString(),
                             originType,
-                            etToCity.getTag().toString(),
+                            etToSubdistrict.getTag().toString(),
                             destinationType,
                             etWeight.getText().toString(),
                             etCourier.getText().toString()
@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void popUpCity(final EditText etCity, final EditText etSubdistrict, final EditText etProvince) {
+    public void popUpCity(final EditText etCity, final EditText etProvince, final EditText etSubdistrict) {
 
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void popUpSubdistrict(final EditText etSubdistrict, final EditText etCity) {
+    private void popUpSubdistrict(final EditText etSubdistrict, final EditText etCity, final EditText etProvince) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View alertLayout = inflater.inflate(R.layout.custom_dialog_search, null);
@@ -454,9 +454,8 @@ public class MainActivity extends AppCompatActivity {
 
         private View view;
 
-        private MyTextWatcherSubdistrict(View view) {
-            this.view = view;
-        }
+
+        private MyTextWatcherSubdistrict(View view) { this.view = view; }
 
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
         }
@@ -637,6 +636,8 @@ public class MainActivity extends AppCompatActivity {
         listItemExpedisi.add(itemItemExpedisi);
         itemItemExpedisi = new ItemExpedisi("1", "jne");
         listItemExpedisi.add(itemItemExpedisi);
+        itemItemExpedisi = new ItemExpedisi("1", "jnt");
+        listItemExpedisi.add(itemItemExpedisi);
 
         mListView.setAdapter(adapter_expedisi);
 
@@ -683,8 +684,10 @@ public class MainActivity extends AppCompatActivity {
                         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                         View alertLayout = inflater.inflate(R.layout.custom_dialog_result, null);
                         alert = new AlertDialog.Builder(MainActivity.this);
-                        alert.setTitle("Result Cost");
-                        alert.setMessage(response.body().getRajaongkir().getResults().get(0).getName());
+                        alert.setTitle(response.body().getRajaongkir().getResults().get(0).getName());
+                        alert.setMessage(response.body().getRajaongkir().getOriginDetails().getSubdistrictName()+", "+
+                                response.body().getRajaongkir().getOriginDetails().getCity()+" Ke "+response.body().getRajaongkir().getDestinationDetails().getSubdistrictName()+", "+
+                                response.body().getRajaongkir().getDestinationDetails().getCity());
                         alert.setView(alertLayout);
                         alert.setCancelable(true);
 
@@ -696,18 +699,19 @@ public class MainActivity extends AppCompatActivity {
                         TextView tv_coast = (TextView) alertLayout.findViewById(R.id.tv_coast);
                         TextView tv_time = (TextView) alertLayout.findViewById(R.id.tv_time);
 
-                        tv_origin.setText(response.body().getRajaongkir().getOriginDetails().getSubdistrictName()+", "+
-                                response.body().getRajaongkir().getOriginDetails().getCity()+", "+response.body().getRajaongkir().getOriginDetails().getProvince());
+                        int count_data = response.body().getRajaongkir().getResults().size();
+                        for (int a = 0; a <= count_data - 1; a++) {
+                            int count_data2 = response.body().getRajaongkir().getResults().get(a).getCosts().size();
+                            for (int b = 0; b <= count_data2 - 1; b++) {
 
-                        tv_destination.setText(response.body().getRajaongkir().getDestinationDetails().getSubdistrictName()+", "+
-                                response.body().getRajaongkir().getDestinationDetails().getCity()+", "+response.body().getRajaongkir().getDestinationDetails().getProvince());
+                                tv_expedisi.setText(response.body().getRajaongkir().getResults().get(a).getCosts().get(b).getDescription() + " (" +
+                                        response.body().getRajaongkir().getResults().get(a).getCosts().get(b).getService() + ") ");
 
-                        tv_expedisi.setText(response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getDescription()+" ("+
-                                response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getService()+") ");
+                                tv_coast.setText("Rp. " + response.body().getRajaongkir().getResults().get(a).getCosts().get(b).getCost().get(0).getValue().toString());
 
-                        tv_coast.setText("Rp. "+response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getCost().get(0).getValue().toString());
-
-                        tv_time.setText(response.body().getRajaongkir().getResults().get(0).getCosts().get(0).getCost().get(0).getEtd()+" (Days)");
+                                tv_time.setText(response.body().getRajaongkir().getResults().get(a).getCosts().get(b).getCost().get(0).getEtd() + " (Days)");
+                            }
+                        }
 
                         etCourier.setText("");
                     } else {
